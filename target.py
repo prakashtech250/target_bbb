@@ -34,9 +34,25 @@ class targetApi:
             'sec-gpc': '1',
             'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36',
         }
+        cookies = {
+            'TealeafAkaSid': 'Da5AV3noQszxoVSX1BBvJ11HkNeruGEC',
+            'visitorId': '01836E4974590201ACA02C25A0200A09',
+            'sapphire': '1',
+            'UserLocation': '44601|27.700|85.310|BA|NP',
+            'usprivacy': '1YY-',
+            'fiatsCookie': 'DSI_794|DSN_Canton|DSZ_44720',
+            'ci_pixmgr': 'other',
+            'crl8.fpcuid': '6e16c00f-c7cd-4fa9-8f48-6daa78fbf2eb',
+            'egsSessionId': '0e8a035e-fe77-42d6-a67e-9d14c75531d4',
+            'accessToken': 'eyJraWQiOiJlYXMyIiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJiNmJhNDNjYS1hNTY2LTQzZTEtOTExNi0wOWYwNjJjNDI4MTUiLCJpc3MiOiJNSTYiLCJleHAiOjE2NjQ5ODQ0NDUsImlhdCI6MTY2NDg5ODA0NSwianRpIjoiVEdULmIyNDljZWZlNGFlZDQ0MDhiYmVlMGRkMzZjYTJlZTJkLWwiLCJza3kiOiJlYXMyIiwic3V0IjoiRyIsImRpZCI6IjRkM2U3NjFhZTRhMWZjMGUwNjBiMTY1N2NjMjU1Zjg1NjMyMzU5OGRmYzlkOThjODY0OTViMTA2NGYyNzAwMTciLCJzY28iOiJlY29tLm5vbmUsb3BlbmlkIiwiY2xpIjoiZWNvbS13ZWItMS4wLjAiLCJhc2wiOiJMIn0.ZYz9I5k7yymC5-Jqq3If2K3bUtm7sIi70uKpvqDhHKHv1KfuB8-Qt1Q-UWwUIBdGJUwUnY5WRLy8sg7s-eZmo7t6h_oQGiYLmnnVZm6N2PIPtBHKO13B4T7KyMblO4KFqze7C9_L_DOgegHDL0Ao2e6ZjiueZxOxDzZP63R2j7C1T8QU2TBkTR0-ycij3I4Sk6rtmNuNXukJrsdIT09aPfZ3cBEyMDO49vUHUAfpNzhX7A26EfLv_Ce0zAPojNQdC-MPRtDdxEnq1kSf1NkyUIxnU4Ne3cuhZHOdoLNYZaXWrtsxH7v6MZBRzaWtYLaAya26W2DRwaKMycnb1eu7Ow',
+            'idToken': 'eyJhbGciOiJub25lIn0.eyJzdWIiOiJiNmJhNDNjYS1hNTY2LTQzZTEtOTExNi0wOWYwNjJjNDI4MTUiLCJpc3MiOiJNSTYiLCJleHAiOjE2NjQ5ODQ0NDUsImlhdCI6MTY2NDg5ODA0NSwiYXNzIjoiTCIsInN1dCI6IkciLCJjbGkiOiJlY29tLXdlYi0xLjAuMCIsInBybyI6eyJmbiI6bnVsbCwiZW0iOm51bGwsInBoIjpmYWxzZSwibGVkIjpudWxsLCJsdHkiOmZhbHNlfX0.',
+            'refreshToken': 'pbrDqasvmejsGhWzpM8sNMjgQ3xwRvWMc27tFIyxEO_HcHMc6CTYQavuMXfN1g2GsoKl6x5xzuK8fnvI1wZYsw',
+            'ffsession': '{%22sessionHash%22:%2210e9b3c1f09c1b1664002654784%22%2C%22prevPageName%22:%22home:%20bath:%20beach%20towels%22%2C%22prevPageType%22:%22level%203%22%2C%22prevPageUrl%22:%22https://www.target.com/c/beach-towels-bath-home/red/-/N-5xtv6?sortBy=bestselling&moveTo=product-list-grid%22%2C%22prevSearchTerm%22:%22non-search%22%2C%22sessionHit%22:18}',
+            '_mitata': 'MmE3YjVjMDgzZWU1OThkN2YzYTdiMTYzMTBhZDQzYmEwZDA3OGEzNWE3NjE1NmVlYmQ0MWNhMDZhMjkxOTM4Nw==_/@#/1664898277_/@#/cOaP4hamOE7aXwla_/@#/NjIwNTg4YWE2ZDNkMGVhNjJjZWQzMWFlNjAwOGY1Yzg2NzA1MDJjZWNmNmNjMDk1MWY1MWE3MTdjMDE0NTA3Mg==_/@#/000',
+        }
         while True:
             try:
-                response = requests.get(url, headers=headers)
+                response = requests.get(url, headers=headers, cookies=cookies)
                 break
             except Exception as e:
                 print(f'[red][-][/red] Error: {e}')
@@ -379,13 +395,11 @@ class targetApi:
 
             self.save_data(data)
             print(f'[green][+][/green] {self.best_selling_rank}: {title}')
-
         if start < total_results:
             more = True
         else:
             more = False
         return more
-
 
     def main(self):
         start = 0
@@ -393,7 +407,7 @@ class targetApi:
         # url = 'https://www.target.com/c/bath-towels-home/-/N-5xtv9?sortBy=newest&moveTo=product-list-grid'
         link = self.link
         while more:
-            more = self.get_products(link, 0)
+            more = self.get_products(link, start)
             start += 24
         print(f'[green][+][/green] Task completed successfully.')
 
