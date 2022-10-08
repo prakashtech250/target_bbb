@@ -38,6 +38,7 @@ class AmazonApi:
         self.folder = 'output'
         self.filename = os.path.join(self.folder, filename)
         self.designList = ['Cabana Stripe', 'Stripe','Jacquard', 'Peshtemal', 'Printed', 'Solid', 'Floral', 'Nautical', 'Geometric']
+        self.color_frequency = {}
 
     def cookiesToDict(self, filename):
         print("[green][+][/green] Getting cookies from [u]amazon_cookies.json[/u]")
@@ -105,6 +106,7 @@ class AmazonApi:
             asin = jd.get('id')
             product_url = 'https://www.amazon.com/dp/' + asin
             self.get_details(product_url)
+            break
 
     def get_features(self,asin):
         url = 'https://www.amazon.in/hz/reviews-render/ajax/lazy-widgets/stream?asin={}&csrf=gpiBcGvSxAwt24MiRKAPH9bY%2FefoS5ELeFZdAf4AAAABAAAAAGJVqjxyYXcAAAAA%2B4kUEk%2F7iMGR3xPcX6iU&language=en_IN&lazyWidget=cr-summarization-attributes'.format(asin)
@@ -221,6 +223,12 @@ class AmazonApi:
             all_colors = ','.join(colors)
         else:
             all_colors = None
+        if all_colors:
+            for ac in all_colors.split(','):
+                if ac in list(self.color_frequency.keys()):
+                    self.color_frequency[ac] += 1
+                else:
+                    self.color_frequency[ac] = 1
         detailsTable = soup.find(id="productDetails_detailBullets_sections1")
         tableRow = detailsTable.find_all('tr')
         for tr in tableRow:
@@ -322,6 +330,9 @@ class AmazonApi:
         self.get_products(url)
         url = url + '?pg=2'
         self.get_products(url)
+        with open('output/frequency.txt', 'w') as f:
+            for key, value in self.color_frequency.items():
+                f.write(f"{key}: {value}\n")
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description='Script to scrape product details for amazon.com', epilog='Output are saved inside output folder.')
