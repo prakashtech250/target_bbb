@@ -106,7 +106,6 @@ class AmazonApi:
             asin = jd.get('id')
             product_url = 'https://www.amazon.com/dp/' + asin
             self.get_details(product_url)
-            break
 
     def get_features(self,asin):
         url = 'https://www.amazon.in/hz/reviews-render/ajax/lazy-widgets/stream?asin={}&csrf=gpiBcGvSxAwt24MiRKAPH9bY%2FefoS5ELeFZdAf4AAAABAAAAAGJVqjxyYXcAAAAA%2B4kUEk%2F7iMGR3xPcX6iU&language=en_IN&lazyWidget=cr-summarization-attributes'.format(asin)
@@ -199,6 +198,8 @@ class AmazonApi:
             title = title_div.text.strip()
         else:
             title = None
+        quick_dry = False
+        sand_free = False
         if title:
             if 'kids' in title.lower() and 'adults' in title.lower():
                 kidAdult = 'Kids/Adults'
@@ -208,6 +209,10 @@ class AmazonApi:
                 kidAdult = 'Adults'
             else:
                 kidAdult = ''
+            if 'quick dry' in title.lower() or 'fast dry' in title.lower():
+                quick_dry = True
+            if 'sand free' in title.lower() or 'sand resist' in title.lower():
+                sand_free = True
         else:
             kidAdult = None
         if title:
@@ -230,55 +235,57 @@ class AmazonApi:
                 else:
                     self.color_frequency[ac] = 1
         detailsTable = soup.find(id="productDetails_detailBullets_sections1")
-        tableRow = detailsTable.find_all('tr')
-        for tr in tableRow:
-            heading = tr.th.text.strip()
-            detail = tr.td.text.strip()
-            if 'Brand' in heading:
-                supplier = detail
-            if 'Manufacturer' in heading and supplier is None:
-                supplier = detail
-            if 'Color' in heading:
-                color = detail
-            if 'Material' in heading:
-                blend = detail
-            if 'Number of Items' in heading:
-                pack = detail.strip()
-            if 'Pattern' in heading and pattern is None:
-                pattern = detail.strip()
-            if 'Dimensions' in heading and size is None:
-                size = detail
-            # if 'Size' in heading and size is None:
-            #     if 'Pack' not in detail:
-            #         size = detail
-            if 'Weight' in heading:
-                gsm = detail.strip()
-            if 'Date First Available' in heading:
-                first_available = detail.strip()
+        if detailsTable:
+            tableRow = detailsTable.find_all('tr')
+            for tr in tableRow:
+                heading = tr.th.text.strip()
+                detail = tr.td.text.strip()
+                if 'Brand' in heading:
+                    supplier = detail
+                if 'Manufacturer' in heading and supplier is None:
+                    supplier = detail
+                if 'Color' in heading:
+                    color = detail
+                if 'Material' in heading:
+                    blend = detail
+                if 'Number of Items' in heading:
+                    pack = detail.strip()
+                if 'Pattern' in heading and pattern is None:
+                    pattern = detail.strip()
+                if 'Dimensions' in heading and size is None:
+                    size = detail
+                # if 'Size' in heading and size is None:
+                #     if 'Pack' not in detail:
+                #         size = detail
+                if 'Weight' in heading:
+                    gsm = detail.strip()
+                if 'Date First Available' in heading:
+                    first_available = detail.strip()
         
         detailsTable2 = soup.find(id="productOverview_feature_div").table
-        tableRow = detailsTable2.find_all('tr')
-        for tr in tableRow:
-            heading = tr.find_all('td')[0].text.strip()
-            detail = tr.find_all('td')[1].text.strip()
-            if 'Brand' in heading and supplier is None:
-                supplier = detail
-            if 'Manufacturer' in heading and supplier is None:
-                supplier = detail
-            if 'Color' in heading and color is None:
-                color = detail
-            if 'Material' in heading and blend is None:
-                blend = detail
-            if 'Number of Pieces' in heading and pack is None:
-                pack = detail.strip()
-            if 'Number of Items' in heading and pack is None:
-                pack = detail.strip()
-            if 'Dimensions' in heading and size is None:
-                size = detail
-            if 'Weight' in heading and gsm is None:
-                gsm = detail.strip()
-            if 'Pattern' in heading and pattern is None:
-                pattern = detail.strip()
+        if detailsTable2:
+            tableRow = detailsTable2.find_all('tr')
+            for tr in tableRow:
+                heading = tr.find_all('td')[0].text.strip()
+                detail = tr.find_all('td')[1].text.strip()
+                if 'Brand' in heading and supplier is None:
+                    supplier = detail
+                if 'Manufacturer' in heading and supplier is None:
+                    supplier = detail
+                if 'Color' in heading and color is None:
+                    color = detail
+                if 'Material' in heading and blend is None:
+                    blend = detail
+                if 'Number of Pieces' in heading and pack is None:
+                    pack = detail.strip()
+                if 'Number of Items' in heading and pack is None:
+                    pack = detail.strip()
+                if 'Dimensions' in heading and size is None:
+                    size = detail
+                if 'Weight' in heading and gsm is None:
+                    gsm = detail.strip()
+                if 'Pattern' in heading and pattern is None:
+                    pattern = detail.strip()
         twlCat = str(pack) + ' Beach'
         if color is None:
             color_div = soup.find(id="variation_color_name")
@@ -289,8 +296,14 @@ class AmazonApi:
         # if size:
         #     size = size.replace('inches','').replace('X','*').replace(' ','').replace('in','').replace('x','*').replace('\"','').replace('\'','').replace('Inch','').replace('L','').replace('W','')
         rating_div = soup.find(id="averageCustomerReviews")
-        rating = rating_div.find(class_="a-icon-alt").text.split(' ')[0]
-        reviews = soup.find(id="acrCustomerReviewText").text.replace('ratings','').replace(',','').strip()
+        try:
+            rating = rating_div.find(class_="a-icon-alt").text.split(' ')[0]
+        except:
+            rating = 0
+        try:
+            reviews = soup.find(id="acrCustomerReviewText").text.replace('ratings','').replace(',','').strip()
+        except:
+            reviews = 0
         features = self.get_features(asin)
         # light_weight, softness, absorbency, value, travel, durability, easy_clean
         scraped_items = {
@@ -320,17 +333,18 @@ class AmazonApi:
             'For Traveling': features[4],
             'Durability': features[5],
             'Easy to Clean': features[6],
+            'Quick Fast Dry': quick_dry,
+            'Sand Free': sand_free,
             'Product Url': url,
         }
         self.save_data(scraped_items)
         print(f'[green][+][/green] {self.rank}: {url} [Saved]       ')
 
     def main(self):
-        url = 'https://www.amazon.com/gp/bestsellers/home-garden/3731751'
-        self.get_products(url)
-        url = url + '?pg=2'
-        self.get_products(url)
-        with open('output/frequency.txt', 'w') as f:
+        for i in range(2):
+            url = 'https://www.amazon.com/gp/bestsellers/home-garden/3731751?pg=' + str(i+1)
+            self.get_products(url)
+        with open('output/frequency_amazon.txt', 'w') as f:
             for key, value in self.color_frequency.items():
                 f.write(f"{key}: {value}\n")
 
