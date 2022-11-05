@@ -14,3 +14,10 @@ commands to run.
     For example:
  -> python3 target.py -o test.csv -u 'https://www.target.com/c/bath-towels-home/-/N-5xtv9?sortBy=newest&moveTo=product-list-grid'
 
+# Amazon Scraper
+
+commands to run.
+    -> python3 amazon.py -o output_filename.csv
+    
+    For example:
+    -> python3 amazon.py -o amazon_beach_towel.csv
