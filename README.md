@@ -18,8 +18,9 @@ For example:
 # Amazon Scraper
 
 commands to run.
-    -> python3 amazon.py -o output_filename.csv
+
+    python3 amazon.py -o output_filename.csv -u 'links of grid'
     
 For example:
 
-        python3 amazon.py -o amazon_beach_towel.csv
+        python3 amazon.py -o amazon_beach_towel.csv -u 'https://www.amazon.com/gp/bestsellers/home-garden/3731761/ref=pd_zg_hrsr_home-garden'
