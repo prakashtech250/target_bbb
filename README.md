@@ -8,8 +8,8 @@ To list out list of parameters.
  ->python3 target.py --help
 
 commands to run.
-
-python3 target.py -o output_filename.csv -u 'links_of_grid'
+    
+    python3 target.py -o output_filename.csv -u 'links_of_grid'
 
 For example:
 
